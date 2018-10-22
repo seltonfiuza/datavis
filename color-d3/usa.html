@@ -6,26 +6,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 
-	<script src="https://d3js.org/d3.v5.min.js"></script>
-	<script src="https://d3js.org/topojson.v2.min.js"></script>
-	<style>
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <script src="https://d3js.org/topojson.v2.min.js"></script>
+  <style>
 
-		.counties {
-		  fill: none;
-		}
+    .counties {
+      fill: none;
+    }
 
-		.states {
-		  fill: none;
-		  stroke: #eee;
-		  stroke-linejoin: round;
-		}
+    .states {
+      fill: none;
+      stroke: #eee;
+      stroke-linejoin: round;
+    }
 
-	</style>
+  </style>
 </head>
 <body>
   <main role="main" class="container">
     <header>
-	   <h1>Taxa de desemprego nos EUA em agosto de 2016</h1>
+     <h1>Taxa de desemprego nos EUA em agosto de 2016</h1>
    </header>
    <div id="map"></div>
   </main>
@@ -37,10 +37,13 @@ let width = 960,
 
 let rateById = d3.map();
 
-//Create a quantize color scale here
-// Consider that the unemployment rate goes from 0 to 10% (.10)
-// display the colors in nine different levels of greens
+let dgreens = d3.schemeGreens[8];
+let color = d3.scaleQuantize()
+            .domain([2,10])
+            .range(dgreens)
+
 let path = d3.geoPath();
+
 
 let svg = d3.select("#map").append("svg")
     .attr("width", width)
@@ -53,26 +56,17 @@ let promises = [
 
 Promise.all(promises).then(ready);
 
-let cpiyg = d3.scaleSequential(d3.interpolatePiYG); 
-let dpiyg = d3.scaleOrdinal(d3.schemePiYG[8]);
-
-var tip = d3.tip()
-  .attr('class', 'd3-tip')
-  .offset([-10, 0])
-  .html(function(d) {
-    return "<strong>d:</strong> <span style='color:red'>" + JSON.stringify(d) + "</span>";
-  })
-
 function ready([us]) {
-  console.log(us);
+  
   svg.append("g")
       .attr("class", "counties")
     .selectAll("path")
       .data(topojson.feature(us, us.objects.counties).features)
     .enter().append("path")
-      .attr("fill", function(d) { return "#777"; })
+      .attr("fill", function(d) { return color(rateById.get(d.id)); })
       .attr("d", path)
-      .on('mouseover', tip.d)
+      .append("title")
+      .text((d)=> rateById.get(d.id)+'%')
 
   svg.append("path")
       .datum(topojson.mesh(us, us.objects.states, function(a, b) { return a !== b; }))
