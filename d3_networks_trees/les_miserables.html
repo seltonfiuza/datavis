@@ -63,7 +63,7 @@
               let qtdArestas = 0;
               links.forEach(l => {
                 if(nodes.id == l.source.id || nodes.id == l.target.id){
-                  qtdArestas += l.value
+                  qtdArestas += 1
                 }
 
               })
@@ -82,7 +82,7 @@
           function conn(nodes) {
             let qtdArestas = 0;
             links.forEach(l => {
-              console.log(l)
+              // console.log(l)
               if(nodes.id == l.source.id || nodes.id == l.target.id){
                 qtdArestas += l.value
               }
